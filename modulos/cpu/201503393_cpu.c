@@ -24,12 +24,7 @@ struct list_head *list;
  
 static int procinfo_proc_show(struct seq_file *m, void *v)
 {
-  seq_printf(m,"201503393\nJose Daniel De Leon Ruiz\nDebian 10\n");
-	seq_printf(m,"\nPARENT PID\t\t\tPROCESS\t\t\tSTATE\n");
-
-	for_each_process( task ){
-	        seq_printf(m, "%d\t\t\t%s\t\t\t%ld\n",task->pid, task->comm, task->state);
-	} 
+        
         return 0;
 }
 
@@ -47,14 +42,14 @@ static const struct file_operations procinfo_proc_fops = {
 
 static int __init cpuinfo_init(void)   
 {
-    printk(KERN_INFO "Jose Daniel De Leon Ruiz\n");   
-    proc_create("cpu_201503393", 0, NULL, &procinfo_proc_fops); 
+    printk(KERN_INFO "Inicia el modulo de CPU\n");   
+    proc_create("201503393_cpu", 0, NULL, &procinfo_proc_fops); 
     return 0;
 }
      
 static void __exit cpuinfo_exit(void)
 {
-    printk(KERN_INFO "Sistemas Operativos 1\n");
+    printk(KERN_INFO "Termina el modulo de CPU\n");
 }
  
 module_init(cpuinfo_init); 

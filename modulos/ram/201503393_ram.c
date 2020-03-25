@@ -26,8 +26,7 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
         si_meminfo(&i);
 #define K(x) ((x) << (PAGE_SHIFT - 10))
         seq_printf(m,
-		"201503393\nJose Daniel De Leon Ruiz\nDebian 10\n"
-                "MemTotal:       %8lu kB\n"
+		"MemTotal:       %8lu kB\n"
                 "MemFree:        %8lu kB\n"
                 "Porcentaje:     %8lu kB\n"
                 ,
@@ -55,14 +54,14 @@ static const struct file_operations meminfo_proc_fops = {
 
 static int __init memo_init(void)
 {
-	printk(KERN_INFO "201503393\n");       
-	proc_create("memo_201503393", 0, NULL, &meminfo_proc_fops);
+	printk(KERN_INFO "Inicia el modulo de RAM\n");       
+	proc_create("201503393_ram", 0, NULL, &meminfo_proc_fops);
         return 0;
 }
 
 static void __exit memo_exit(void)
 {
-   printk(KERN_INFO "Sistemas Operativos 1\n"); 
+   printk(KERN_INFO "Termina el modulo de RAM\n"); 
 }
 
 module_init(memo_init);
