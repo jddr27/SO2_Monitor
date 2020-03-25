@@ -17,24 +17,41 @@
 #include <linux/atomic.h>
 #include <asm/page.h>
 #include <asm/pgtable.h>
-
-struct task_struct *task;        
-struct task_struct *task_child;       
-struct list_head *list;  
  
-static int procinfo_proc_show(struct seq_file *m, void *v)
+ 
+void __attribute__((weak)) arch_report_meminfo(struct seq_file *m)
 {
-        
+}
+
+static int cpuinfo_proc_show(struct seq_file *m, void *v)
+{
+        struct cpustats c;
+        si_stat(&c);
+#define K(x) ((x) << (PAGE_SHIFT - 10))
+        seq_printf(m,
+		"User:       %8lu por\n"
+                "Nice:        %8lu por\n"
+                "System:     %8lu por\n"
+                "total:     %8lu por\n"
+                ,
+                K(c.user),
+                K(c.nice),
+                K(c.system),
+                K(c.total)
+                );
+
+        arch_report_meminfo(m);
         return 0;
+#undef K
 }
 
-static int procinfo_proc_open(struct inode *inode, struct file *file)
+static int cpuinfo_proc_open(struct inode *inode, struct file *file)
 {
-        return single_open(file, procinfo_proc_show, NULL);
+        return single_open(file, cpuinfo_proc_show, NULL);
 }
 
-static const struct file_operations procinfo_proc_fops = {
-        .open           = procinfo_proc_open,
+static const struct file_operations cpuinfo_proc_fops = {
+        .open           = cpuinfo_proc_open,
         .read           = seq_read,
         .llseek         = seq_lseek,
         .release        = single_release,
@@ -43,7 +60,7 @@ static const struct file_operations procinfo_proc_fops = {
 static int __init cpuinfo_init(void)   
 {
     printk(KERN_INFO "Inicia el modulo de CPU\n");   
-    proc_create("201503393_cpu", 0, NULL, &procinfo_proc_fops); 
+    proc_create("201503393_cpu", 0, NULL, &cpuinfo_proc_fops); 
     return 0;
 }
      

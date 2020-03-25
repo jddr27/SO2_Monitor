@@ -3,7 +3,7 @@
 #include <linux/init.h>
 #include <linux/sched/signal.h>
 #include <linux/sched.h>
- 
+
 #include <linux/fs.h>
 #include <linux/hugetlb.h>
 #include <linux/mm.h>
@@ -17,19 +17,22 @@
 #include <linux/atomic.h>
 #include <asm/page.h>
 #include <asm/pgtable.h>
-
-struct task_struct *task;        
-struct task_struct *task_child;       
-struct list_head *list;  
+ 
+ 
+struct task_struct *task;  /* Structure defined in sched.h for tasks/processes */
+struct task_struct *task_child;  /* Structure needed to iterate through task children */
+struct list_head *list;  /* Structure needed to iterate through the list in each task->children struct */
  
 static int procinfo_proc_show(struct seq_file *m, void *v)
 {
-    seq_printf(m,"\nPARENT PID\t\t\tPROCESS\t\t\tSTATE\n");
-
-	for_each_process( task ){
-	        seq_printf(m, "%d\t\t\t%s\t\t\t%ld\n",task->pid, task->comm, task->state);
-	} 
-        return 0;
+    for_each_process( task ){
+        seq_printf(m,"\nPARENT PID: %d PROCESS: %s STATE: %ld",task->pid, task->comm, task->state);
+        list_for_each(list, &task->children){ 
+            task_child = list_entry( list, struct task_struct, sibling );
+            seq_printf(m, "\nCHILD OF %s[%d] PID: %d PROCESS: %s STATE: %ld",task->comm, task->pid, task_child->pid, task_child->comm, task_child->state);
+        }
+        seq_printf(m,"-----------------------------------------------------"); 
+    }    
 }
 
 static int procinfo_proc_open(struct inode *inode, struct file *file)

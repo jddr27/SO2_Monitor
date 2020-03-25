@@ -1,6 +1,6 @@
-#include <linux/module.h>    // Incluido para todos los modulos de kernel
-#include <linux/kernel.h>    // Incluido para KERN_INFO
-#include <linux/init.h>        // Incluido para __init y __exit macros
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/init.h>
 
 #include <linux/fs.h>
 #include <linux/hugetlb.h>
@@ -26,8 +26,8 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
         si_meminfo(&i);
 #define K(x) ((x) << (PAGE_SHIFT - 10))
         seq_printf(m,
-		"MemTotal:       %8lu kB\n"
-                "MemFree:        %8lu kB\n"
+		"RamTotal:       %8lu kB\n"
+                "RamFree:        %8lu kB\n"
                 "Porcentaje:     %8lu kB\n"
                 ,
                 K(i.totalram),
