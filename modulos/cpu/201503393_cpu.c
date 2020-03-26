@@ -89,7 +89,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	u64 sum = 0;
 	u64 sum_softirq = 0;
 	u64 total;
-	long double divi, tmp, porce;
+	float divi, tmp, porce;
 	unsigned int per_softirq_sums[NR_SOFTIRQS] = {0};
 	struct timespec64 boottime;
 
@@ -109,15 +109,15 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	user		+= cpustat[CPUTIME_USER];
 	nice		+= cpustat[CPUTIME_NICE];
 	system		+= cpustat[CPUTIME_SYSTEM];
-	idle		+= get_idle_time(&kcpustat, i);
-	iowait		+= get_iowait_time(&kcpustat, i);
+	idle		+= get_idle_time(&kcpustat, 0);
+	iowait		+= get_iowait_time(&kcpustat, 0);
 	irq		+= cpustat[CPUTIME_IRQ];
 	softirq		+= cpustat[CPUTIME_SOFTIRQ];
 	steal		+= cpustat[CPUTIME_STEAL];
 	guest		+= cpustat[CPUTIME_GUEST];
 	guest_nice	+= cpustat[CPUTIME_GUEST_NICE];
-	sum		+= kstat_cpu_irqs_sum(i);
-	sum		+= arch_irq_stat_cpu(i);
+	sum		+= kstat_cpu_irqs_sum(0);
+	sum		+= arch_irq_stat_cpu(0);
 
 	for (j = 0; j < NR_SOFTIRQS; j++) {
 		unsigned int softirq_stat = kstat_softirqs_cpu(j, 0);
@@ -146,7 +146,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest_nice));
 	seq_putc(p, '\n');
-	seq_printf(p,"\"Total\": %LF", porce);
+	seq_printf(p,"\"Total\": %F", porce);
 	seq_putc(p, '\n');
 
 	return 0;
