@@ -39,12 +39,14 @@
     <body>
 
         <blockquote class="blockquote text-center">
-            <h2>Hola Daniel, el resumen es:</h2>
-            <h3 id="visitorCount">{{ . }}</h3> 
+            <h2>Monitor de Memoria RAM</h2>
+            <h3 id="total">Total: 0 MB</h3> 
+            <h3 id="usado">Usado: 0 MB</h3> 
+            <h3 id="porce">Porcentaje: 0%</h3> 
         </blockquote>
 
         <section class="subheader">
-            <h4>Monitor de memoria RAM</h4>
+            <h4>Grafica en tiemmpo real</h4>
             <button id="getUpdates" class="btn-primary"> Iniciar</button>
         </section>
 

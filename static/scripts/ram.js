@@ -1,6 +1,6 @@
-document.getElementById("getUpdates").addEventListener("click", function(){
-    axios.get('/obtenerRAM')
-})
+window.onload = function DOMcompleto() { 
+  axios.get('/obtenerRAM'); 
+} 
 
 const pusher = new Pusher('9afe9110eb9f886eed9e', {
     cluster: 'us2',
@@ -19,7 +19,9 @@ channel.bind('addNumber', data => {
   newLineChart.data.datasets[0].data.push(data.Per);
   newLineChart.update();
 
-  document.getElementById('visitorCount').textContent = "Total: " + data.Total + " MB Usado: " + data.Usado + " MB Porcentaje: " + data.Per + "%";
+  document.getElementById('total').textContent = "Total: " + data.Total + " MB";
+  document.getElementById('usado').textContent = "Usado: " + data.Usado + " MB";
+  document.getElementById('porce').textContent = "Porcentaje: " + data.Per + "%";
 });
 
 function renderChart(ramData) {

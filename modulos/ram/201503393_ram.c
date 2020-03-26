@@ -26,13 +26,13 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
         si_meminfo(&i);
 #define K(x) ((x) << (PAGE_SHIFT - 10))
         seq_printf(m,
-		"RamTotal:       %8lu kB\n"
-                "RamFree:        %8lu kB\n"
-                "Porcentaje:     %8lu kB\n"
+		"{\n\"Total\": %8lu,\n"
+                "\"Usado\": %8lu,\n"
+                "\"Per\": %8lu\n}"
                 ,
                 K(i.totalram),
-                K(i.freeram),
-                K(i.freeram * 100 / i.totalram)
+                K(i.totalram - i.freeram),
+                K((i.totalram - i.freeram) * 100 / i.totalram)
                 );
 
         arch_report_meminfo(m);

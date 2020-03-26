@@ -1,24 +1,20 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
-
-	"bufio"
-	"flag"
-	"log"
-	"os"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
 	pusher "github.com/pusher/pusher-http-go"
 	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/mem"
 	"github.com/shirou/gopsutil/process"
 )
 
@@ -99,14 +95,19 @@ func setInterval(ourFunc func(), milliseconds int, async bool) chan bool {
 func obtenerRAM(c echo.Context) error {
 	setInterval(func() {
 		currentTime := time.Now()
-		v, _ := mem.VirtualMemory()
-		newRAMData := ramData{
-			Total:  v.Total,
-			Usado:  v.Used,
-			Per:    v.UsedPercent,
-			Tiempo: currentTime.Format("2006.01.02 15:04:05"),
+
+		data, err := ioutil.ReadFile("/proc/201503393_ram")
+		if err != nil {
+			fmt.Println("File reading error", err)
+			return c.String(http.StatusConflict, "File reading error")
 		}
-		//fmt.Println(percentage[0])
+		fmt.Println("Contents of file:", string(data))
+
+		ramJSON := string(data)
+		var ramData newRAMData
+		json.Unmarshal([]byte(ramJSON), &newRAMData)
+		newRAMData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
+
 		client.Trigger("ramPercentage", "addNumber", newRAMData)
 	}, 2500, true)
 
@@ -196,46 +197,16 @@ func listarProcs(c echo.Context) error {
 }
 
 func listarCPU(c echo.Context) error {
-	/*percentage, _ := cpu.Percent(0, true)
+	percentage, _ := cpu.Percent(0, true)
 	texto := ""
 	for _, cpupercent := range percentage {
 		texto = texto + strconv.FormatFloat(cpupercent, 'f', 2, 64) + "%"
-	}*/
-	texto := leerCPU()
-	fmt.Println(texto)
+	}
 	return c.Render(http.StatusOK, "cpu", texto)
 }
 
-func leerCPU() string {
-	fptr := flag.String("fpath", "/proc/stat", "file path to read from")
-	flag.Parse()
-
-	f, err := os.Open(*fptr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer func() {
-		if err = f.Close(); err != nil {
-			log.Fatal(err)
-		}
-	}()
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		return s.Text() // aca regresa la primera linea
-	}
-	err = s.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return "-1"
-}
-
 func listarRAM(c echo.Context) error {
-	v, _ := mem.VirtualMemory()
-	ntotal := v.Total / 1000000
-	nusado := v.Used / 1000000
-	texto := "Total: " + strconv.FormatUint(ntotal, 10) + " MB Usado: " + strconv.FormatUint(nusado, 10) + " MB Porcentaje: " + strconv.FormatFloat(v.UsedPercent, 'f', 2, 64) + "%"
-	return c.Render(http.StatusOK, "ram", texto)
+	return c.Render(http.StatusOK, "ram", "")
 }
 
 func iniciar(c echo.Context) error {
