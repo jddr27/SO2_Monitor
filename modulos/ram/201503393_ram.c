@@ -24,20 +24,6 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
 {
         struct sysinfo i;
         si_meminfo(&i);
-/*#define K(x) ((x) << (PAGE_SHIFT - 10))
-        seq_printf(m,
-		"{\n\"Total\": %8lu,\n"
-                "\"Usado\": %8lu,\n"
-                "\"Per\": %8lu\n}\n"
-                ,
-                K(i.totalram),
-                K(i.totalram - i.freeram),
-                K(((i.totalram - i.freeram) * 100) / i.totalram)
-                );
-
-        arch_report_meminfo(m);
-        return 0;
-#undef K*/
         seq_printf(m,"{\n\"Total\": %8lu,\n\"Usado\": %8lu,\n\"Per\": %8lu\n}\n", i.totalram,(i.totalram - i.freeram),(((i.totalram - i.freeram) * 100) / i.totalram));
         return 0;
 }
