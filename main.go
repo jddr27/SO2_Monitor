@@ -201,7 +201,7 @@ func listarCPU(c echo.Context) error {
 	for _, cpupercent := range percentage {
 		texto = texto + strconv.FormatFloat(cpupercent, 'f', 2, 64) + "%"
 	}*/
-	texto = leerCPU()
+	texto := leerCPU()
 	fmt.Println(texto)
 	return c.Render(http.StatusOK, "cpu", texto)
 }
