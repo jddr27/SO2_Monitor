@@ -8,6 +8,11 @@ import (
 	"strconv"
 	"time"
 
+	"bufio"
+	"flag"
+	"log"
+	"os"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -191,12 +196,38 @@ func listarProcs(c echo.Context) error {
 }
 
 func listarCPU(c echo.Context) error {
-	percentage, _ := cpu.Percent(0, true)
+	/*percentage, _ := cpu.Percent(0, true)
 	texto := ""
 	for _, cpupercent := range percentage {
 		texto = texto + strconv.FormatFloat(cpupercent, 'f', 2, 64) + "%"
-	}
+	}*/
+	texto = leerCPU()
+	fmt.Println(texto)
 	return c.Render(http.StatusOK, "cpu", texto)
+}
+
+func leerCPU() {
+	fptr := flag.String("fpath", "/proc/stat", "file path to read from")
+	flag.Parse()
+
+	f, err := os.Open(*fptr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		if err = f.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	s := bufio.NewScanner(f)
+	for s.Scan() {
+		return s.Text() // aca regresa la primera linea
+	}
+	err = s.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return "-1"
 }
 
 func listarRAM(c echo.Context) error {
