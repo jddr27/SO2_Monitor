@@ -102,7 +102,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	u64 *cpustat = kcpustat.cpustat;
 
 	//kcpustat_cpu_fetch(&kcpustat, 0);
-	*kcpustat = kcpustat_cpu(0);
+	kcpustat = kcpustat_cpu(0);
 
 	user		+= cpustat[CPUTIME_USER];
 	nice		+= cpustat[CPUTIME_NICE];
@@ -125,13 +125,13 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	}
 	sum += arch_irq_stat();
 
-	u64 total = nsec_to_clock_t(user) + nsec_to_clock_t(nice) + nsec_to_clock_t(system) + 
+	total = nsec_to_clock_t(user) + nsec_to_clock_t(nice) + nsec_to_clock_t(system) + 
                 nsec_to_clock_t(idle) + nsec_to_clock_t(iowait) + nsec_to_clock_t(irq) + 
                 nsec_to_clock_t(softirq) + nsec_to_clock_t(steal) + nsec_to_clock_t(guest) + 
                 nsec_to_clock_t(guest_nice);
-	u64 divi = idle / total;
-	u64 tmp = 1.0 - divi;
-	u64 porce = tmp * 100;
+	divi = idle / total;
+	tmp = 1.0 - divi;
+	porce = tmp * 100;
 
     seq_put_decimal_ull(p, "cpu  ", nsec_to_clock_t(user));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(nice));
