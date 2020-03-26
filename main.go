@@ -206,7 +206,7 @@ func listarCPU(c echo.Context) error {
 	return c.Render(http.StatusOK, "cpu", texto)
 }
 
-func leerCPU() {
+func leerCPU() string {
 	fptr := flag.String("fpath", "/proc/stat", "file path to read from")
 	flag.Parse()
 
