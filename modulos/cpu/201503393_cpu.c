@@ -16,12 +16,14 @@
 #include <linux/sched/cputime.h>
 #include <linux/tick.h>
 
+/*
 #ifndef arch_irq_stat_cpu
 #define arch_irq_stat_cpu(cpu) 0
 #endif
 #ifndef arch_irq_stat
 #define arch_irq_stat() 0
 #endif
+*/
 
 #ifdef arch_idle_time
 
@@ -55,7 +57,6 @@ static u64 get_idle_time(int cpu)
 		idle_usecs = get_cpu_idle_time_us(cpu, NULL);
 
 	if (idle_usecs == -1ULL)
-		/* !NO_HZ or cpu offline so we can rely on cpustat.idle */
 		idle = kcpustat_cpu(cpu).cpustat[CPUTIME_IDLE];
 	else
 		idle = idle_usecs * NSEC_PER_USEC;
@@ -71,7 +72,6 @@ static u64 get_iowait_time(int cpu)
 		iowait_usecs = get_cpu_iowait_time_us(cpu, NULL);
 
 	if (iowait_usecs == -1ULL)
-		/* !NO_HZ or cpu offline so we can rely on cpustat.iowait */
 		iowait = kcpustat_cpu(cpu).cpustat[CPUTIME_IOWAIT];
 	else
 		iowait = iowait_usecs * NSEC_PER_USEC;
@@ -80,6 +80,24 @@ static u64 get_iowait_time(int cpu)
 }
 
 #endif
+
+
+static u64 nsec_to_clock_t(u64 x)
+{
+#if (NSEC_PER_SEC % USER_HZ) == 0
+	return div_u64(x, NSEC_PER_SEC / USER_HZ);
+#elif (USER_HZ % 512) == 0
+	return div_u64(x * USER_HZ / 512, NSEC_PER_SEC / 512);
+#else
+	/*
+         * max relative error 5.7e-8 (1.8s per year) for USER_HZ <= 1024,
+         * overflow after 64.99 years.
+         * exact for HZ=60, 72, 90, 120, 144, 180, 300, 600, 900, ...
+         */
+	return div_u64(x * 9, (9ull * NSEC_PER_SEC + (USER_HZ / 2)) / USER_HZ);
+#endif
+}
+
 
 static int cpuinfo_proc_show(struct seq_file *p, void *v)
 {
@@ -107,7 +125,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 		steal += kcpustat_cpu(i).cpustat[CPUTIME_STEAL];
 		guest += kcpustat_cpu(i).cpustat[CPUTIME_GUEST];
 		guest_nice += kcpustat_cpu(i).cpustat[CPUTIME_GUEST_NICE];
-		sum += kstat_cpu_irqs_sum(i);
+		/*sum += kstat_cpu_irqs_sum(i);
 		sum += arch_irq_stat_cpu(i);
 
 		for (j = 0; j < NR_SOFTIRQS; j++) {
@@ -115,9 +133,9 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 
 			per_softirq_sums[j] += softirq_stat;
 			sum_softirq += softirq_stat;
-		}
+		}*/
 	}
-	sum += arch_irq_stat();
+	//sum += arch_irq_stat();
 
 	seq_put_decimal_ull(p, "cpu  ", nsec_to_clock_t(user));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(nice));
