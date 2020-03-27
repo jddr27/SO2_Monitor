@@ -27,13 +27,13 @@ struct list_head *list;  /* Structure needed to iterate through the list in each
 static int procinfo_proc_show(struct seq_file *m, void *v)
 {
     for_each_process( task ){
-        seq_printf(m,"{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%ld\",\"hijos\":",task->pid, task->comm, task->state);
+        seq_printf(m,"{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%ld\",\n\"hijos\":",task->pid, task->comm, task->state);
         list_for_each(list, &task->children){ 
             task_child = list_entry( list, struct task_struct, sibling );
             seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\",\n\t\t\"estado\": \"%ld\"",task_child->pid, task_child->comm, task_child->state);
             seq_printf(m,"\n\t}\n");
         }
-        seq_printf(m,"\n}\n"); 
+        seq_printf(m,"\n},\n"); 
     }   
     return 0; 
 }
