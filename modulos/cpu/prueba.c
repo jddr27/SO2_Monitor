@@ -83,7 +83,7 @@ static u64 get_iowait_time(struct kernel_cpustat *kcs, int cpu)
 
 static int cpuinfo_proc_show(struct seq_file *p, void *v)
 {
-	int j;
+	int i, j;
 	u64 user, nice, system, idle, iowait, irq, softirq, steal;
 	u64 guest, guest_nice;
 	u64 sum = 0;
@@ -103,8 +103,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	
 	u64 *cpustat = kcpustat.cpustat;
 
-	//kcpustat_cpu_fetch(&kcpustat, 0);
-	kcpustat = kcpustat_cpu(0);
+	kcpustat_cpu_fetch(&kcpustat, 0);
 
 	user		+= cpustat[CPUTIME_USER];
 	nice		+= cpustat[CPUTIME_NICE];
@@ -146,7 +145,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest_nice));
 	seq_putc(p, '\n');
-	seq_put_decimal_ull(p, " = ", nsec_to_clock_t(total));
+	seq_printf(p,"\"Total\": %F", porce);
 	seq_putc(p, '\n');
 
 	return 0;
@@ -154,7 +153,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 
 static int cpuinfo_proc_open(struct inode *inode, struct file *file)
 {
-    unsigned int size = 1024 + 128 * num_online_cpus();
+        unsigned int size = 1024 + 128 * num_online_cpus();
 	/* minimum size to display an interrupt count : 2 bytes */
 	size += 2 * nr_irqs;
 	return single_open_size(file, cpuinfo_proc_show, NULL, size);
