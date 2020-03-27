@@ -33,7 +33,8 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
             seq_printf(m, "\n{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%ld\"",task_child->pid, task_child->comm, task_child->state);
         }
         seq_printf(m,"\n}\n"); 
-    }    
+    }   
+    return 0; 
 }
 
 static int procinfo_proc_open(struct inode *inode, struct file *file)
