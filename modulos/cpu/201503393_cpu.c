@@ -82,7 +82,7 @@ static u64 get_iowait_time(int cpu)
 #endif
 
 
-static u64 nsec_to_clock_t(u64 x)
+u64 nsec_to_clock_t(u64 x)
 {
 #if (NSEC_PER_SEC % USER_HZ) == 0
 	return div_u64(x, NSEC_PER_SEC / USER_HZ);
@@ -101,12 +101,12 @@ static u64 nsec_to_clock_t(u64 x)
 
 static int cpuinfo_proc_show(struct seq_file *p, void *v)
 {
-	int i, j;
+	int i;//, j;
 	u64 user, nice, system, idle, iowait, irq, softirq, steal;
 	u64 guest, guest_nice;
-	u64 sum = 0;
-	u64 sum_softirq = 0;
-	unsigned int per_softirq_sums[NR_SOFTIRQS] = {0};
+	//u64 sum = 0;
+	//u64 sum_softirq = 0;
+	//unsigned int per_softirq_sums[NR_SOFTIRQS] = {0};
 	struct timespec64 boottime;
 
 	user = nice = system = idle = iowait =
