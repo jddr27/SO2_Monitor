@@ -39,11 +39,11 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	int i;
 	u64 user, nice, system, idle, iowait, irq, softirq, steal;
 	u64 guest, guest_nice;
-	u64 total, total2;
+	u64 total;
 
 	user = nice = system = idle = iowait = irq = softirq = steal = 0;
 	guest = guest_nice = 0;
-	total = total2 = 0;
+	total = 0;
 
 	for_each_possible_cpu(i) {
 		user += kcpustat_cpu(i).cpustat[CPUTIME_USER];
@@ -58,15 +58,10 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 		guest_nice += kcpustat_cpu(i).cpustat[CPUTIME_GUEST_NICE];
 	}
 
-	total = nsec_to_clock_t(user) + nsec_to_clock_t(nice) + nsec_to_clock_t(system) + 
-            nsec_to_clock_t(idle) + nsec_to_clock_t(iowait) + nsec_to_clock_t(irq) + 
-            nsec_to_clock_t(softirq) + nsec_to_clock_t(steal) + nsec_to_clock_t(guest) + 
-            nsec_to_clock_t(guest_nice);
-
-	total2 = user + nice + system + idle + iowait + irq + 
+	total = user + nice + system + idle + iowait + irq + 
             softirq + steal + guest + guest_nice;
 
-	seq_put_decimal_ull(p, "cpu  ", nsec_to_clock_t(user));
+	/*seq_put_decimal_ull(p, "cpu  ", nsec_to_clock_t(user));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(nice));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(system));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(idle));
@@ -78,7 +73,11 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest_nice));
 	seq_put_decimal_ull(p, " = ", nsec_to_clock_t(total));
 	seq_put_decimal_ull(p, " = ", nsec_to_clock_t(total2));
-	seq_putc(p, '\n');
+	seq_putc(p, '\n');*/
+	
+	seq_put_decimal_ull(p, "{\n\"Total\":  ", nsec_to_clock_t(total));
+	seq_put_decimal_ull(p, ",\n\"Idle\": ", nsec_to_clock_t(idle));
+	seq_putc(p, '\n}\n');
 
 	return 0;
 }

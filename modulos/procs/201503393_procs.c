@@ -1,6 +1,7 @@
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
+
 #include <linux/sched/signal.h>
 #include <linux/sched.h>
 
@@ -26,12 +27,12 @@ struct list_head *list;  /* Structure needed to iterate through the list in each
 static int procinfo_proc_show(struct seq_file *m, void *v)
 {
     for_each_process( task ){
-        seq_printf(m,"\nPARENT PID: %d PROCESS: %s STATE: %ld",task->pid, task->comm, task->state);
+        seq_printf(m,"{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%ld\",\"hijos\":",task->pid, task->comm, task->state);
         list_for_each(list, &task->children){ 
             task_child = list_entry( list, struct task_struct, sibling );
-            seq_printf(m, "\nCHILD OF %s[%d] PID: %d PROCESS: %s STATE: %ld",task->comm, task->pid, task_child->pid, task_child->comm, task_child->state);
+            seq_printf(m, "\n{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%ld\"",task_child->pid, task_child->comm, task_child->state);
         }
-        seq_printf(m,"-----------------------------------------------------"); 
+        seq_printf(m,"\n}\n"); 
     }    
 }
 
