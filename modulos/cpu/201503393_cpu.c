@@ -25,21 +25,21 @@
 
 #ifdef arch_idle_time
 
-static u64 get_idle_time(struct kernel_cpustat *kcs, int cpu)
+static u64 get_idle_time(int cpu)
 {
 	u64 idle;
 
-	idle = kcs->cpustat[CPUTIME_IDLE];
+	idle = kcpustat_cpu(cpu).cpustat[CPUTIME_IDLE];
 	if (cpu_online(cpu) && !nr_iowait_cpu(cpu))
 		idle += arch_idle_time(cpu);
 	return idle;
 }
 
-static u64 get_iowait_time(struct kernel_cpustat *kcs, int cpu)
+static u64 get_iowait_time(int cpu)
 {
 	u64 iowait;
 
-	iowait = kcs->cpustat[CPUTIME_IOWAIT];
+	iowait = kcpustat_cpu(cpu).cpustat[CPUTIME_IOWAIT];
 	if (cpu_online(cpu) && nr_iowait_cpu(cpu))
 		iowait += arch_idle_time(cpu);
 	return iowait;
@@ -47,7 +47,7 @@ static u64 get_iowait_time(struct kernel_cpustat *kcs, int cpu)
 
 #else
 
-static u64 get_idle_time(struct kernel_cpustat *kcs, int cpu)
+static u64 get_idle_time(int cpu)
 {
 	u64 idle, idle_usecs = -1ULL;
 
@@ -56,14 +56,14 @@ static u64 get_idle_time(struct kernel_cpustat *kcs, int cpu)
 
 	if (idle_usecs == -1ULL)
 		/* !NO_HZ or cpu offline so we can rely on cpustat.idle */
-		idle = kcs->cpustat[CPUTIME_IDLE];
+		idle = kcpustat_cpu(cpu).cpustat[CPUTIME_IDLE];
 	else
 		idle = idle_usecs * NSEC_PER_USEC;
 
 	return idle;
 }
 
-static u64 get_iowait_time(struct kernel_cpustat *kcs, int cpu)
+static u64 get_iowait_time(int cpu)
 {
 	u64 iowait, iowait_usecs = -1ULL;
 
@@ -72,7 +72,7 @@ static u64 get_iowait_time(struct kernel_cpustat *kcs, int cpu)
 
 	if (iowait_usecs == -1ULL)
 		/* !NO_HZ or cpu offline so we can rely on cpustat.iowait */
-		iowait = kcs->cpustat[CPUTIME_IOWAIT];
+		iowait = kcpustat_cpu(cpu).cpustat[CPUTIME_IOWAIT];
 	else
 		iowait = iowait_usecs * NSEC_PER_USEC;
 
@@ -97,23 +97,18 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	getboottime64(&boottime);
 
 	for_each_possible_cpu(i) {
-		struct kernel_cpustat kcpustat;
-		u64 *cpustat = kcpustat.cpustat;
-
-		kcpustat_cpu_fetch(&kcpustat, i);
-
-		user		+= cpustat[CPUTIME_USER];
-		nice		+= cpustat[CPUTIME_NICE];
-		system		+= cpustat[CPUTIME_SYSTEM];
-		idle		+= get_idle_time(&kcpustat, i);
-		iowait		+= get_iowait_time(&kcpustat, i);
-		irq			+= cpustat[CPUTIME_IRQ];
-		softirq		+= cpustat[CPUTIME_SOFTIRQ];
-		steal		+= cpustat[CPUTIME_STEAL];
-		guest		+= cpustat[CPUTIME_GUEST];
-		guest_nice	+= cpustat[CPUTIME_GUEST_NICE];
-		sum		+= kstat_cpu_irqs_sum(i);
-		sum		+= arch_irq_stat_cpu(i);
+		user += kcpustat_cpu(i).cpustat[CPUTIME_USER];
+		nice += kcpustat_cpu(i).cpustat[CPUTIME_NICE];
+		system += kcpustat_cpu(i).cpustat[CPUTIME_SYSTEM];
+		idle += get_idle_time(i);
+		iowait += get_iowait_time(i);
+		irq += kcpustat_cpu(i).cpustat[CPUTIME_IRQ];
+		softirq += kcpustat_cpu(i).cpustat[CPUTIME_SOFTIRQ];
+		steal += kcpustat_cpu(i).cpustat[CPUTIME_STEAL];
+		guest += kcpustat_cpu(i).cpustat[CPUTIME_GUEST];
+		guest_nice += kcpustat_cpu(i).cpustat[CPUTIME_GUEST_NICE];
+		sum += kstat_cpu_irqs_sum(i);
+		sum += arch_irq_stat_cpu(i);
 
 		for (j = 0; j < NR_SOFTIRQS; j++) {
 			unsigned int softirq_stat = kstat_softirqs_cpu(j, i);
