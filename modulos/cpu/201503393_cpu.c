@@ -16,71 +16,6 @@
 #include <linux/sched/cputime.h>
 #include <linux/tick.h>
 
-/*
-#ifndef arch_irq_stat_cpu
-#define arch_irq_stat_cpu(cpu) 0
-#endif
-#ifndef arch_irq_stat
-#define arch_irq_stat() 0
-#endif
-*/
-
-#ifdef arch_idle_time
-
-static u64 get_idle_time(int cpu)
-{
-	u64 idle;
-
-	idle = kcpustat_cpu(cpu).cpustat[CPUTIME_IDLE];
-	if (cpu_online(cpu) && !nr_iowait_cpu(cpu))
-		idle += arch_idle_time(cpu);
-	return idle;
-}
-
-static u64 get_iowait_time(int cpu)
-{
-	u64 iowait;
-
-	iowait = kcpustat_cpu(cpu).cpustat[CPUTIME_IOWAIT];
-	if (cpu_online(cpu) && nr_iowait_cpu(cpu))
-		iowait += arch_idle_time(cpu);
-	return iowait;
-}
-
-#else
-
-static u64 get_idle_time(int cpu)
-{
-	u64 idle, idle_usecs = -1ULL;
-
-	if (cpu_online(cpu))
-		idle_usecs = get_cpu_idle_time_us(cpu, NULL);
-
-	if (idle_usecs == -1ULL)
-		idle = kcpustat_cpu(cpu).cpustat[CPUTIME_IDLE];
-	else
-		idle = idle_usecs * NSEC_PER_USEC;
-
-	return idle;
-}
-
-static u64 get_iowait_time(int cpu)
-{
-	u64 iowait, iowait_usecs = -1ULL;
-
-	if (cpu_online(cpu))
-		iowait_usecs = get_cpu_iowait_time_us(cpu, NULL);
-
-	if (iowait_usecs == -1ULL)
-		iowait = kcpustat_cpu(cpu).cpustat[CPUTIME_IOWAIT];
-	else
-		iowait = iowait_usecs * NSEC_PER_USEC;
-
-	return iowait;
-}
-
-#endif
-
 
 u64 nsec_to_clock_t(u64 x)
 {
@@ -101,41 +36,34 @@ u64 nsec_to_clock_t(u64 x)
 
 static int cpuinfo_proc_show(struct seq_file *p, void *v)
 {
-	int i;//, j;
+	int i;
 	u64 user, nice, system, idle, iowait, irq, softirq, steal;
 	u64 guest, guest_nice;
-	//u64 sum = 0;
-	//u64 sum_softirq = 0;
-	//unsigned int per_softirq_sums[NR_SOFTIRQS] = {0};
-	struct timespec64 boottime;
+	u64 total;
 
-	user = nice = system = idle = iowait =
-		irq = softirq = steal = 0;
+	user = nice = system = idle = iowait = irq = softirq = steal = 0;
 	guest = guest_nice = 0;
-	getboottime64(&boottime);
 
 	for_each_possible_cpu(i) {
 		user += kcpustat_cpu(i).cpustat[CPUTIME_USER];
 		nice += kcpustat_cpu(i).cpustat[CPUTIME_NICE];
 		system += kcpustat_cpu(i).cpustat[CPUTIME_SYSTEM];
-		idle += get_idle_time(i);
-		iowait += get_iowait_time(i);
+		idle += kcpustat_cpu(i).cpustat[CPUTIME_IDLE];
+		iowait += kcpustat_cpu(i).cpustat[CPUTIME_IOWAIT];
 		irq += kcpustat_cpu(i).cpustat[CPUTIME_IRQ];
 		softirq += kcpustat_cpu(i).cpustat[CPUTIME_SOFTIRQ];
 		steal += kcpustat_cpu(i).cpustat[CPUTIME_STEAL];
 		guest += kcpustat_cpu(i).cpustat[CPUTIME_GUEST];
 		guest_nice += kcpustat_cpu(i).cpustat[CPUTIME_GUEST_NICE];
-		/*sum += kstat_cpu_irqs_sum(i);
-		sum += arch_irq_stat_cpu(i);
-
-		for (j = 0; j < NR_SOFTIRQS; j++) {
-			unsigned int softirq_stat = kstat_softirqs_cpu(j, i);
-
-			per_softirq_sums[j] += softirq_stat;
-			sum_softirq += softirq_stat;
-		}*/
 	}
-	//sum += arch_irq_stat();
+
+	total = nsec_to_clock_t(user) + nsec_to_clock_t(nice) + nsec_to_clock_t(system) + 
+                nsec_to_clock_t(idle) + nsec_to_clock_t(iowait) + nsec_to_clock_t(irq) + 
+                nsec_to_clock_t(softirq) + nsec_to_clock_t(steal) + nsec_to_clock_t(guest) + 
+                nsec_to_clock_t(guest_nice);
+	//divi = idle / total;
+	//tmp = 1.0 - divi;
+	//porce = tmp * 100;
 
 	seq_put_decimal_ull(p, "cpu  ", nsec_to_clock_t(user));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(nice));
@@ -147,6 +75,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(steal));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest));
 	seq_put_decimal_ull(p, " ", nsec_to_clock_t(guest_nice));
+	seq_put_decimal_ull(p, " = ", nsec_to_clock_t(total));
 	seq_putc(p, '\n');
 
 	return 0;
@@ -154,10 +83,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 
 static int cpuinfo_proc_open(struct inode *inode, struct file *file)
 {
-    unsigned int size = 1024 + 128 * num_online_cpus();
-	/* minimum size to display an interrupt count : 2 bytes */
-	size += 2 * nr_irqs;
-	return single_open_size(file, cpuinfo_proc_show, NULL, size);
+    return single_open(file, cpuinfo_proc_show, NULL);
 }
 
 static const struct file_operations cpuinfo_proc_fops = {
