@@ -39,7 +39,7 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
         seq_printf(m,"\n]},\n"); 
     }
     seq_printf(m,"],");
-    seq_printf(m,"\n\"Todos\": %d,\n\"Corr\": %d,\n\"Durm\": %d,\n\"Para\": %d,\n\"Zomb\": %d\n}\n", total,corr,para,zomb);   
+    seq_printf(m,"\n\"Todos\": %d,\n\"Corr\": %d,\n\"Durm\": %d,\n\"Para\": %d,\n\"Zomb\": %d\n}\n", todos, corr, durm, para, zomb);   
     return 0; 
 }
 
