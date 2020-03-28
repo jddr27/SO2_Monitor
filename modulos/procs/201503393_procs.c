@@ -24,18 +24,42 @@ struct task_struct *task;  /* Structure defined in sched.h for tasks/processes *
 struct task_struct *task_child;  /* Structure needed to iterate through task children */
 struct list_head *list;  /* Structure needed to iterate through the list in each task->children struct */
  
+int todos, corr, durm, para, zomb;
+
+char get_task_state(long state)
+{
+    switch (state) {
+        case TASK_RUNNING:
+            corr++;
+            return 'R';
+        case TASK_INTERRUPTIBLE:
+            durm++;
+            return 'S';
+        case TASK_ZOMBIE:
+            zomb++;
+            return 'Z';
+        case __TASK_STOPPED:
+            para++;
+            return 'T';
+        default:
+        {
+            return '?';
+        }
+    }
+}
+
 static int procinfo_proc_show(struct seq_file *m, void *v)
 {
-    int todos, corr, durm, para, zomb;
     todos = corr = durm = para = zomb = 0;
     seq_printf(m,"{\nProcs:[");
     for_each_process( task ){
-        seq_printf(m,"{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%ld\",\n\"hijos\":[",task->pid, task->comm, task->state);
+        seq_printf(m,"{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%s\",\n\"hijos\":[",task->pid, task->comm, get_task_state(task->state));
         list_for_each(list, &task->children){ 
             task_child = list_entry( list, struct task_struct, sibling );
-            seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\",\n\t\t\"estado\": \"%ld\"",task_child->pid, task_child->comm, task_child->state);
+            seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\",\n\t\t\"estado\": \"%s\"",task_child->pid, task_child->comm, get_task_state(task_child->state));
             seq_printf(m,"\n\t}\n");
         }
+        todos++;
         seq_printf(m,"\n]},\n"); 
     }
     seq_printf(m,"],");
