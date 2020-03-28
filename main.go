@@ -7,14 +7,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
 	pusher "github.com/pusher/pusher-http-go"
-	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/process"
 )
 
@@ -28,6 +26,8 @@ var client = pusher.Client{
 }
 
 type cpuData struct {
+	Total  int
+	Idle   int
 	Per    float64
 	Tiempo string
 }
@@ -39,25 +39,25 @@ type ramData struct {
 	Tiempo string
 }
 
-type procsData struct {
-	Pid    int32
-	Usu    string
-	Est    string
-	Per    float32
+type Hijo struct {
+	Pid    int
 	Nombre string
 }
 
-type procInfo struct {
-	Total int
-	Cor   int
-	Sus   int
-	Det   int
-	Zom   int
+type Padre struct {
+	Pid    int
+	Nombre string
+	Estado string
+	Hijos  []Hijo
 }
 
-type procFinal struct {
-	Lista []procsData
-	Info  procInfo
+type procsData struct {
+	Proce []Padre
+	Todos int
+	Corr  int
+	Durm  int
+	Para  int
+	Zomb  int
 }
 
 func setInterval(ourFunc func(), milliseconds int, async bool) chan bool {
@@ -104,11 +104,12 @@ func obtenerRAM(c echo.Context) error {
 		fmt.Println("Contents of file:", string(data))
 
 		ramJSON := string(data)
-		var ramData newRAMData
-		json.Unmarshal([]byte(ramJSON), &newRAMData)
-		newRAMData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
+		var ramData newRAMdata
+		json.Unmarshal([]byte(ramJSON), &newRAMdata)
+		newRAMdata.Per = ((newRAMdata.Usado * 100) / newRAMdata.Total)
+		newRAMdata.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 
-		client.Trigger("ramPercentage", "addNumber", newRAMData)
+		client.Trigger("ramPercentage", "addNumber", newRAMdata)
 	}, 2500, true)
 
 	return c.String(http.StatusOK, "RAM begun")
@@ -117,13 +118,20 @@ func obtenerRAM(c echo.Context) error {
 func obtenerCPU(c echo.Context) error {
 	setInterval(func() {
 		currentTime := time.Now()
-		percentage, _ := cpu.Percent(0, true)
-		newCPUData := cpuData{
-			Per:    percentage[0],
-			Tiempo: currentTime.Format("2006.01.02 15:04:05"),
+
+		data, err := ioutil.ReadFile("/proc/201503393_cpu")
+		if err != nil {
+			fmt.Println("File reading error", err)
+			return c.String(http.StatusConflict, "File reading error")
 		}
-		//fmt.Println(percentage[0])
-		client.Trigger("cpuPercentage", "addNumber", newCPUData)
+		//fmt.Println("Contents of file:", string(data))
+
+		cpuJSON := string(data)
+		var cpuData newCPUdata
+		json.Unmarshal([]byte(cpuJSON), &newCPUdata)
+		newCPUdata.Per = ((newCPUdata.Idle * 100) / newCPUdata.Total)
+		newCPUdata.Tiempo = currentTime.Format("2006.01.02 15:04:05")
+		client.Trigger("cpuPercentage", "addNumber", newCPUdata)
 	}, 2500, true)
 
 	return c.String(http.StatusOK, "CPU begun")
@@ -140,69 +148,22 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func listarProcs(c echo.Context) error {
-	arrayProcs := []procsData{}
-	total := 0
-	pR := 0
-	pS := 0
-	pT := 0
-	pZ := 0
-	processes, _ := process.Processes()
-
-	for _, proc := range processes {
-		pid := proc.Pid
-		username, _ := proc.Username()
-		estado, _ := proc.Status()
-		porcentaje, _ := proc.MemoryPercent()
-		nombre, _ := proc.Name()
-		newProcsData := procsData{
-			Pid:    pid,
-			Usu:    username,
-			Est:    estado,
-			Per:    porcentaje,
-			Nombre: nombre,
-		}
-		//fmt.Println(newProcsData.Pid, newProcsData.Usu, newProcsData.Est, newProcsData.Per, newProcsData.Nombre)
-		arrayProcs = append(arrayProcs, newProcsData)
-		total = total + 1
-		switch estado {
-		case "R":
-			pR = pR + 1
-		case "S":
-			pS = pS + 1
-		case "T":
-			pT = pT + 1
-		case "Z":
-			pZ = pZ + 1
-		}
+	data, err := ioutil.ReadFile("/proc/201503393_procs")
+	if err != nil {
+		fmt.Println("File reading error", err)
+		return c.String(http.StatusConflict, "File reading error")
 	}
-	//for _, elem := range arrayProcs {
-	//	fmt.Println(elem.Pid, elem.Usu, elem.Est, elem.Per, elem.Nombre)
-	//}
-	newProcInfo := procInfo{
-		Total: total,
-		Cor:   pR,
-		Sus:   pS,
-		Det:   pT,
-		Zom:   pZ,
-	}
-	//fmt.Println(newProcInfo.Total, newProcInfo.Cor, newProcInfo.Sus, newProcInfo.Det, newProcInfo.Zom)
-	//fmt.Println("entro")
+	//fmt.Println("Contents of file:", string(data))
 
-	newProcFinal := procFinal{
-		Lista: arrayProcs,
-		Info:  newProcInfo,
-	}
+	procsJSON := string(data)
+	var procData newProcData
+	json.Unmarshal([]byte(procsJSON), &newProcData)
 
-	return c.Render(http.StatusOK, "procs", newProcFinal)
+	return c.Render(http.StatusOK, "procs", newProcData)
 }
 
 func listarCPU(c echo.Context) error {
-	percentage, _ := cpu.Percent(0, true)
-	texto := ""
-	for _, cpupercent := range percentage {
-		texto = texto + strconv.FormatFloat(cpupercent, 'f', 2, 64) + "%"
-	}
-	return c.Render(http.StatusOK, "cpu", texto)
+	return c.Render(http.StatusOK, "cpu", "")
 }
 
 func listarRAM(c echo.Context) error {
