@@ -27,16 +27,16 @@ var client = pusher.Client{
 
 // cpuData : struct del CPU
 type cpuData struct {
-	Total  uint64
-	Idle   uint64
+	Total  float64
+	Idle   float64
 	Per    float64
 	Tiempo string
 }
 
 // ramData : struct de la RAM
 type ramData struct {
-	Total  uint64
-	Usado  uint64
+	Total  float64
+	Usado  float64
 	Per    float64
 	Tiempo string
 }
@@ -109,9 +109,8 @@ func obtenerRAM(c echo.Context) error {
 
 		ramJSON := string(data)
 		var newRAMData ramData
-		var n float64 = 1.0
 		json.Unmarshal([]byte(ramJSON), &newRAMData)
-		newRAMData.Per = ((newRAMData.Usado * 100.0) / newRAMData.Total) * n
+		newRAMData.Per = ((newRAMData.Usado * 100.0) / newRAMData.Total)
 		newRAMData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 
 		client.Trigger("ramPercentage", "addNumber", newRAMData)
@@ -133,9 +132,8 @@ func obtenerCPU(c echo.Context) error {
 
 		cpuJSON := string(data)
 		var newCPUData cpuData
-		var n float64 = 1.0
 		json.Unmarshal([]byte(cpuJSON), &newCPUData)
-		newCPUData.Per = ((newCPUData.Idle * 100.0) / newCPUData.Total) * n
+		newCPUData.Per = ((newCPUData.Idle * 100.0) / newCPUData.Total)
 		newCPUData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 		client.Trigger("cpuPercentage", "addNumber", newCPUData)
 	}, 2500, true)
