@@ -24,10 +24,11 @@ void __attribute__((weak)) arch_report_meminfo(struct seq_file *m)
 static int meminfo_proc_show(struct seq_file *m, void *v)
 {
         struct sysinfo i;
-        const double megabyte = 1024 * 1024;
+        //const double megabyte = 1024 * 1024;
         si_meminfo(&i);
         //seq_printf(m,"{\n\"Total\": %8lu,\n\"Usado\": %8lu,\n\"Per\": %8lu\n}\n", i.totalram,(i.totalram - i.freeram),(((i.totalram - i.freeram) * 100) / i.totalram));
-        seq_printf(m, "{\n\"Total\": %5.1f,\n\"Usado\": %5.1f\n}\n", (i.totalram / megabyte), ((i.totalram - i.freeram) / megabyte));
+        //seq_printf(m, "{\n\"Total\": %5.1f,\n\"Usado\": %5.1f\n}\n", (i.totalram / megabyte), ((i.totalram - i.freeram) / megabyte));
+        seq_printf(m,"{\n\"Total\": %8lu,\n\"Usado\": %8lu\n}\n", i.totalram,(i.totalram - i.freeram));
         return 0;
 }
 
