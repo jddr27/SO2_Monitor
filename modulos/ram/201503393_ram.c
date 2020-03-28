@@ -27,7 +27,7 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
         const double megabyte = 1024 * 1024;
         si_meminfo(&i);
         //seq_printf(m,"{\n\"Total\": %8lu,\n\"Usado\": %8lu,\n\"Per\": %8lu\n}\n", i.totalram,(i.totalram - i.freeram),(((i.totalram - i.freeram) * 100) / i.totalram));
-        seq_printf(m,"{\n\"Total\": %8lu,\n\"Usado\": %8lu,\n\"Per\": %5.1f\n}\n", (i.totalram / megabyte), ((i.totalram - i.freeram) / megabyte),(((i.totalram - i.freeram) * 100) / i.totalram));
+        seq_printf(m,"{\n\"Total\": %f,\n\"Usado\": %f\n}\n", (i.totalram / megabyte), ((i.totalram - i.freeram) / megabyte));
         return 0;
 }
 
