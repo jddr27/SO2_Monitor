@@ -16,7 +16,6 @@
 #include <asm/page.h>
 #include <asm/pgtable.h>
 #include <linux/sys.h>
-#include <stdio.h>
 
 void __attribute__((weak)) arch_report_meminfo(struct seq_file *m)
 {
