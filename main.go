@@ -109,8 +109,9 @@ func obtenerRAM(c echo.Context) error {
 
 		ramJSON := string(data)
 		var newRAMData ramData
+		var n float64 = 1.0
 		json.Unmarshal([]byte(ramJSON), &newRAMData)
-		newRAMData.Per = ((newRAMData.Usado * 100.0) / newRAMData.Total)
+		newRAMData.Per = ((newRAMData.Usado * 100.0) / newRAMData.Total) * n
 		newRAMData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 
 		client.Trigger("ramPercentage", "addNumber", newRAMData)
@@ -132,8 +133,9 @@ func obtenerCPU(c echo.Context) error {
 
 		cpuJSON := string(data)
 		var newCPUData cpuData
+		var n float64 = 1.0
 		json.Unmarshal([]byte(cpuJSON), &newCPUData)
-		newCPUData.Per = ((newCPUData.Idle * 100.0) / newCPUData.Total)
+		newCPUData.Per = ((newCPUData.Idle * 100.0) / newCPUData.Total) * n
 		newCPUData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 		client.Trigger("cpuPercentage", "addNumber", newCPUData)
 	}, 2500, true)
