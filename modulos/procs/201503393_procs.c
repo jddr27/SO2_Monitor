@@ -26,24 +26,24 @@ struct list_head *list;  /* Structure needed to iterate through the list in each
  
 int todos, corr, durm, para, zomb;
 
-char get_task_state(long state)
+char * get_task_state(long state)
 {
     switch (state) {
         case TASK_RUNNING:
             corr++;
-            return 'R';
+            return "R";
         case TASK_INTERRUPTIBLE:
             durm++;
-            return 'S';
+            return "S";
         case TASK_ZOMBIE:
             zomb++;
-            return 'Z';
+            return "Z";
         case __TASK_STOPPED:
             para++;
-            return 'T';
+            return "T";
         default:
         {
-            return '?';
+            return "?";
         }
     }
 }
