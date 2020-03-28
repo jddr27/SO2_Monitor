@@ -56,7 +56,8 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
         seq_printf(m,"{\n\"pid\": %d,\n\"nombre\": \"%s\",\n\"estado\": \"%s\",\n\"hijos\":[",task->pid, task->comm, get_task_state(task->state));
         list_for_each(list, &task->children){ 
             task_child = list_entry( list, struct task_struct, sibling );
-            seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\",\n\t\t\"estado\": \"%s\"",task_child->pid, task_child->comm, get_task_state(task_child->state));
+            //seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\",\n\t\t\"estado\": \"%s\"",task_child->pid, task_child->comm, get_task_state(task_child->state));
+            seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\"",task_child->pid, task_child->comm);
             seq_printf(m,"\n\t}\n");
         }
         todos++;
