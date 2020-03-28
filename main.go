@@ -108,7 +108,7 @@ func obtenerRAM(c echo.Context) error {
 		fmt.Println("Contents of file:", string(data))
 
 		ramJSON := string(data)
-		var ramData newRAMData
+		var newRAMData ramData
 		json.Unmarshal([]byte(ramJSON), &newRAMData)
 		newRAMData.Per = ((newRAMData.Usado * 100) / newRAMData.Total)
 		newRAMData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
@@ -131,7 +131,7 @@ func obtenerCPU(c echo.Context) error {
 		//fmt.Println("Contents of file:", string(data))
 
 		cpuJSON := string(data)
-		var cpuData newCPUData
+		var newCPUData cpuData
 		json.Unmarshal([]byte(cpuJSON), &newCPUData)
 		newCPUData.Per = ((newCPUData.Idle * 100) / newCPUData.Total)
 		newCPUData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
@@ -160,7 +160,7 @@ func listarProcs(c echo.Context) error {
 	//fmt.Println("Contents of file:", string(data))
 
 	procsJSON := string(data)
-	var procData newProcData
+	var newProcData procData
 	json.Unmarshal([]byte(procsJSON), &newProcData)
 
 	return c.Render(http.StatusOK, "procs", newProcData)
