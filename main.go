@@ -104,12 +104,12 @@ func obtenerRAM(c echo.Context) error {
 		fmt.Println("Contents of file:", string(data))
 
 		ramJSON := string(data)
-		var ramData newRAMdata
-		json.Unmarshal([]byte(ramJSON), &newRAMdata)
-		newRAMdata.Per = ((newRAMdata.Usado * 100) / newRAMdata.Total)
-		newRAMdata.Tiempo = currentTime.Format("2006.01.02 15:04:05")
+		var ramData newRAMData
+		json.Unmarshal([]byte(ramJSON), &newRAMData)
+		newRAMData.Per = ((newRAMData.Usado * 100) / newRAMData.Total)
+		newRAMData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 
-		client.Trigger("ramPercentage", "addNumber", newRAMdata)
+		client.Trigger("ramPercentage", "addNumber", newRAMData)
 	}, 2500, true)
 
 	return c.String(http.StatusOK, "RAM begun")
@@ -127,11 +127,11 @@ func obtenerCPU(c echo.Context) error {
 		//fmt.Println("Contents of file:", string(data))
 
 		cpuJSON := string(data)
-		var cpuData newCPUdata
-		json.Unmarshal([]byte(cpuJSON), &newCPUdata)
-		newCPUdata.Per = ((newCPUdata.Idle * 100) / newCPUdata.Total)
-		newCPUdata.Tiempo = currentTime.Format("2006.01.02 15:04:05")
-		client.Trigger("cpuPercentage", "addNumber", newCPUdata)
+		var cpuData newCPUData
+		json.Unmarshal([]byte(cpuJSON), &newCPUData)
+		newCPUData.Per = ((newCPUData.Idle * 100) / newCPUData.Total)
+		newCPUData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
+		client.Trigger("cpuPercentage", "addNumber", newCPUData)
 	}, 2500, true)
 
 	return c.String(http.StatusOK, "CPU begun")
