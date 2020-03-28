@@ -25,13 +25,15 @@ var client = pusher.Client{
 	Secure:  true,
 }
 
+// cpuData : struct del CPU
 type cpuData struct {
-	Total  int
-	Idle   int
+	Total  uint64
+	Idle   uint64
 	Per    float64
 	Tiempo string
 }
 
+// ramData : struct de la RAM
 type ramData struct {
 	Total  uint64
 	Usado  uint64
@@ -100,7 +102,7 @@ func obtenerRAM(c echo.Context) error {
 
 		data, err := ioutil.ReadFile("/proc/201503393_ram")
 		if err != nil {
-			fmt.Println("File reading error", string(err))
+			//fmt.Println("File reading error", string(err))
 			return c.String(http.StatusConflict, "File reading error")
 		}
 		fmt.Println("Contents of file:", string(data))
@@ -123,7 +125,7 @@ func obtenerCPU(c echo.Context) error {
 
 		data, err := ioutil.ReadFile("/proc/201503393_cpu")
 		if err != nil {
-			fmt.Println("File reading error", string(err))
+			//fmt.Println("File reading error", string(err))
 			return c.String(http.StatusConflict, "File reading error")
 		}
 		//fmt.Println("Contents of file:", string(data))
