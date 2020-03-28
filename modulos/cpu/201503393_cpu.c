@@ -77,7 +77,7 @@ static int cpuinfo_proc_show(struct seq_file *p, void *v)
 	
 	seq_put_decimal_ull(p, "{\n\"Total\":  ", nsec_to_clock_t(total));
 	seq_put_decimal_ull(p, ",\n\"Idle\": ", nsec_to_clock_t(idle));
-	seq_putf(p, "\n}\n");
+	seq_printf(p, "\n}\n");
 
 	return 0;
 }
