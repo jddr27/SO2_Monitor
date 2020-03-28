@@ -160,7 +160,7 @@ func listarProcs(c echo.Context) error {
 	//fmt.Println("Contents of file:", string(data))
 
 	procsJSON := string(data)
-	var newProcData procData
+	var newProcData procsData
 	json.Unmarshal([]byte(procsJSON), &newProcData)
 
 	return c.Render(http.StatusOK, "procs", newProcData)
