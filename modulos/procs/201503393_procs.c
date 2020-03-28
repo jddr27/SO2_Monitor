@@ -35,7 +35,7 @@ char * get_task_state(long state)
         case TASK_INTERRUPTIBLE:
             durm++;
             return "S";
-        case TASK_ZOMBIE:
+        case EXIT_ZOMBIE:
             zomb++;
             return "Z";
         case __TASK_STOPPED:
