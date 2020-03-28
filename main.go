@@ -102,8 +102,8 @@ func obtenerRAM(c echo.Context) error {
 
 		data, err := ioutil.ReadFile("/proc/201503393_ram")
 		if err != nil {
-			//fmt.Println("File reading error", string(err))
-			return c.String(http.StatusConflict, "File reading error")
+			fmt.Println("File reading error", err)
+			return //c.String(http.StatusConflict, "File reading error")
 		}
 		fmt.Println("Contents of file:", string(data))
 
@@ -125,8 +125,8 @@ func obtenerCPU(c echo.Context) error {
 
 		data, err := ioutil.ReadFile("/proc/201503393_cpu")
 		if err != nil {
-			//fmt.Println("File reading error", string(err))
-			return c.String(http.StatusConflict, "File reading error")
+			fmt.Println("File reading error", err)
+			return //c.String(http.StatusConflict, "File reading error")
 		}
 		//fmt.Println("Contents of file:", string(data))
 
