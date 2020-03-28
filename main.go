@@ -39,11 +39,13 @@ type ramData struct {
 	Tiempo string
 }
 
+// Hijo : son los procesos hijos
 type Hijo struct {
 	Pid    int
 	Nombre string
 }
 
+// Padre : son los procesos padres
 type Padre struct {
 	Pid    int
 	Nombre string
