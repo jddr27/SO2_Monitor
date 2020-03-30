@@ -83,11 +83,11 @@
             </thead>
             <tbody>
               {{range .Procs}}
-              <tr class="accordion-toggle collapsed" id="accordion1" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">		
+              <tr class="accordion-toggle collapsed" id="accordion{{.Pid}}" data-toggle="collapse" data-parent="#accordion{{.Pid}}" href="#collapse{{.Pid}}">		
                 <td class="expand-button"></td>
                 <td>{{.Pid}}</td>	
                 <td>{{.Nombre}}</td>
-                <td>{Yo</td>	
+                <td>Yo</td>	
                 <td>{{.Estado}}</td>	
                 <td>100</td>	
                 <form action="killProc" method="POST">
@@ -95,7 +95,7 @@
                 </form>
               </tr>
 
-              <tr class="hide-table-padding">
+              <tr id="collapse{{.Pid}}" class="hide-table-padding">
                 <td></td>
                 <td colspan="3">
                 <div class="collapse in p-3">
