@@ -50,15 +50,25 @@ char * get_task_state(long state)
 
 static int procinfo_proc_show(struct seq_file *m, void *v)
 {
+    int conta;
     todos = corr = durm = para = zomb = 0;
+    conta = 0;
     seq_printf(m,"{\nProcs:[");
     for_each_process( task ){
+        if(todos != 0){
+            seq_printf(m,",\n");
+        }
         seq_printf(m,"{\n\"Pid\": %d,\n\"Nombre\": \"%s\",\n\"Estado\": \"%s\",\n\"Hijos\":[",task->pid, task->comm, get_task_state(task->state));
+        conta = 0;
         list_for_each(list, &task->children){ 
+            if(todos != 0){
+                seq_printf(m,",\n");
+            }
             task_child = list_entry( list, struct task_struct, sibling );
             //seq_printf(m, "\n\t{\n\t\t\"pid\": %d,\n\t\t\"nombre\": \"%s\",\n\t\t\"estado\": \"%s\"",task_child->pid, task_child->comm, get_task_state(task_child->state));
             seq_printf(m, "\n\t{\n\t\t\"Pid\": %d,\n\t\t\"Nombre\": \"%s\"",task_child->pid, task_child->comm);
-            seq_printf(m,"\n\t}\n");
+            seq_printf(m,"\n\t}");
+            conta++;
         }
         todos++;
         seq_printf(m,"\n]},\n"); 
