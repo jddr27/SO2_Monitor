@@ -159,7 +159,7 @@ func listarProcs(c echo.Context) error {
 		fmt.Println("File reading error", err)
 		return c.String(http.StatusConflict, "File reading error")
 	}
-	//fmt.Println("Contents of file:", string(data))
+	fmt.Println("Contents of file:", string(data))
 
 	procsJSON := string(data)
 	var newProcData procsData
