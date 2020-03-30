@@ -49,12 +49,12 @@ type Hijo struct {
 
 // Padre : son los procesos padres
 type Padre struct {
-	Pid     int
-	Nombre  string
-	Usuario string
-	Estado  string
-	Per     float64
-	Hijos   []Hijo
+	Pid    int
+	Nombre string
+	//Usuario string
+	Estado string
+	//Per     float64
+	Hijos []Hijo
 }
 
 type procsData struct {
