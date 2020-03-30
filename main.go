@@ -58,7 +58,7 @@ type Padre struct {
 }
 
 type procsData struct {
-	Proce []Padre
+	Procs []Padre
 	Todos int
 	Corr  int
 	Durm  int
