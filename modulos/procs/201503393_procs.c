@@ -55,13 +55,13 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
     conta = 0;
     seq_printf(m,"{\nProcs:[");
     for_each_process( task ){
-        if(todos != 0){
+        if(todos > 0){
             seq_printf(m,",\n");
         }
         seq_printf(m,"{\n\"Pid\": %d,\n\"Nombre\": \"%s\",\n\"Estado\": \"%s\",\n\"Hijos\":[",task->pid, task->comm, get_task_state(task->state));
         conta = 0;
         list_for_each(list, &task->children){ 
-            if(todos != 0){
+            if(conta > 0){
                 seq_printf(m,",\n");
             }
             task_child = list_entry( list, struct task_struct, sibling );
