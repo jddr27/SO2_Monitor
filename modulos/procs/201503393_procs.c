@@ -58,7 +58,7 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
         if(todos > 0){
             seq_printf(m,",\n");
         }
-        seq_printf(m,"{\n\"Pid\": %d,\n\"Nombre\": \"%s\",\n\"Usuario\": \"%s\",\n\"Estado\": \"%s\",\n\"Hijos\":[",task->pid, task->comm, task->cred->uid, get_task_state(task->state));
+        seq_printf(m,"{\n\"Pid\": %d,\n\"Nombre\": \"%s\",\n\"Usuario\": \"%s\",\n\"Estado\": \"%s\",\n\"Hijos\":[",task->pid, task->comm, task->cred->uid->val, get_task_state(task->state));
         conta = 0;
         list_for_each(list, &task->children){ 
             if(conta > 0){
