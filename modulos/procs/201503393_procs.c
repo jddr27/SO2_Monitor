@@ -31,7 +31,7 @@ char * get_task_state(long state)
     switch (state) {
         case TASK_RUNNING:
             corr++;
-            return "R";
+            return "E";
         case TASK_INTERRUPTIBLE:
             durm++;
             return "S";
@@ -40,7 +40,7 @@ char * get_task_state(long state)
             return "Z";
         case __TASK_STOPPED:
             para++;
-            return "T";
+            return "D";
         default:
         {
             return "?";
