@@ -105,7 +105,7 @@ func obtenerRAM(c echo.Context) error {
 			fmt.Println("File reading error", err)
 			return //c.String(http.StatusConflict, "File reading error")
 		}
-		fmt.Println("Contents of file:", string(data))
+		//fmt.Println("Contents of file:", string(data))
 
 		ramJSON := string(data)
 		var newRAMData ramData
@@ -133,7 +133,7 @@ func obtenerCPU(c echo.Context) error {
 		cpuJSON := string(data)
 		var newCPUData cpuData
 		json.Unmarshal([]byte(cpuJSON), &newCPUData)
-		newCPUData.Per = ((newCPUData.Idle * 100.0) / newCPUData.Total)
+		newCPUData.Per = ((1.0 - (newCPUData.Idle / newCPUData.Total)) * 100.0)
 		newCPUData.Tiempo = currentTime.Format("2006.01.02 15:04:05")
 		client.Trigger("cpuPercentage", "addNumber", newCPUData)
 	}, 2500, true)
