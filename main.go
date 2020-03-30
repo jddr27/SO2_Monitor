@@ -164,6 +164,7 @@ func listarProcs(c echo.Context) error {
 	procsJSON := string(data)
 	var newProcData procsData
 	json.Unmarshal([]byte(procsJSON), &newProcData)
+	fmt.Printf("\n!!!!!!!!!!!!!!!!!!!!!!!!\n : %+v", newProcData)
 
 	return c.Render(http.StatusOK, "procs", newProcData)
 }
