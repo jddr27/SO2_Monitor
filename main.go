@@ -161,65 +161,7 @@ func listarProcs(c echo.Context) error {
 	}
 	fmt.Println("Contents of file:", string(data))
 
-	//procsJSON := string(data)
-
-	procsJSON := `{"Procs":[{"Pid": 6969,
-		"Nombre": "sshd",
-		"Estado": "S",
-		"Hijos":[
-				{
-						"Pid": 7028,
-						"Nombre": "sshd"
-				}
-		]},
-		{
-		"Pid": 6971,
-		"Nombre": "systemd",
-		"Estado": "S",
-		"Hijos":[
-				{
-						"Pid": 6972,
-						"Nombre": "(sd-pam)"
-				}
-		]},
-		{
-		"Pid": 6972,
-		"Nombre": "(sd-pam)",
-		"Estado": "S",
-		"Hijos":[
-		]},
-		{
-		"Pid": 7028,
-		"Nombre": "sshd",
-		"Estado": "S",
-		"Hijos":[
-				{
-						"Pid": 7029,
-						"Nombre": "bash"
-				},
-
-				{
-						"Pid": 7030,
-						"Nombre": "sftp-server"
-				}
-		]},
-		{
-		"Pid": 7029,
-		"Nombre": "bash",
-		"Estado": "S",
-		"Hijos":[
-				{
-						"Pid": 7778,
-						"Nombre": "go"
-				}
-		]}],
-		"Todos": 100,
-		"Corr": 0,
-		"Durm": 65,
-		"Para": 0,
-		"Zomb": 0
-		}
-		`
+	procsJSON := string(data)
 	var newProcData procsData
 	json.Unmarshal([]byte(procsJSON), &newProcData)
 	fmt.Printf("\n!!!!!!!!!!!!!!!!!!!!!!!!:\n %+v\n", newProcData)

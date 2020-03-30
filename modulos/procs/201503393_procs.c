@@ -53,7 +53,7 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
     int conta;
     todos = corr = durm = para = zomb = 0;
     conta = 0;
-    seq_printf(m,"{\nProcs:[");
+    seq_printf(m,"{\"Procs\":[");
     for_each_process( task ){
         if(todos > 0){
             seq_printf(m,",\n");
@@ -71,7 +71,7 @@ static int procinfo_proc_show(struct seq_file *m, void *v)
             conta++;
         }
         todos++;
-        seq_printf(m,"\n]}"); 
+        seq_printf(m,"]}"); 
     }
     seq_printf(m,"],");
     seq_printf(m,"\n\"Todos\": %d,\n\"Corr\": %d,\n\"Durm\": %d,\n\"Para\": %d,\n\"Zomb\": %d\n}\n", todos, corr, durm, para, zomb);   
